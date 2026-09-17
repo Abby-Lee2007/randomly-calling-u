@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="一个可创建多个班级、按名单不放回随机点名的本地网页工具。"
+    />
+    <meta name="theme-color" content="#0f766e" />
+    <title>随机点名器</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="随机点名器首页">
+          <span class="brand-mark" aria-hidden="true"><span></span></span>
+          <span class="brand-name">随机点名器</span>
+        </a>
+        <div class="topbar-actions">
+          <span class="save-state" title="数据仅保存在当前浏览器">
+            <span class="save-state-dot" aria-hidden="true"></span>
+            <span id="storageStatus">本机自动保存</span>
+          </span>
+          <button class="button button-primary button-compact" id="createClassTop" type="button">
+            新建班级
+          </button>
+        </div>
+      </header>
+
+      <div class="app-layout">
+        <aside class="sidebar" aria-label="班级文件夹">
+          <div class="sidebar-heading">
+            <div>
+              <p class="eyebrow">CLASS FOLDERS</p>
+              <h1>我的班级</h1>
+            </div>
+            <button
+              class="icon-button"
+              id="createClassSidebar"
+              type="button"
+              aria-label="新建班级"
+              title="新建班级"
+            >
+              <span aria-hidden="true">+</span>
+            </button>
+          </div>
+
+          <nav class="class-nav">
+            <ul class="class-list" id="classList"></ul>
+          </nav>
+
+          <div class="sidebar-foot">
+            <strong id="classTotal">0 个班级</strong>
+            <span>换设备后需重新导入或录入</span>
+          </div>
+        </aside>
+
+        <main class="main-content">
+          <section class="empty-view" id="emptyView">
+            <div class="empty-copy">
+              <p class="eyebrow">READY TO START</p>
+              <h2>先建一个班级</h2>
+              <p>
+                创建班级文件夹后录入同学姓名。保存名单即可自动建立本轮抽取池。
+              </p>
+              <button class="button button-primary button-large" id="createFirstClass" type="button">
+                创建第一个班级
+              </button>
+            </div>
+
+            <div class="empty-visual" aria-hidden="true">
+              <div class="visual-sheet visual-sheet-back"></div>
+              <div class="visual-sheet visual-sheet-front">
+                <span class="sheet-line sheet-line-long"></span>
+                <span class="sheet-line sheet-line-medium"></span>
+                <span class="sheet-line sheet-line-short"></span>
+              </div>
+              <div class="visual-folder">
+                <span class="visual-folder-label">CLASS</span>
+                <span class="visual-folder-count">32</span>
+              </div>
+              <div class="visual-student visual-student-one"></div>
+              <div class="visual-student visual-student-two"></div>
+              <div class="visual-student visual-student-three"></div>
+              <span class="visual-spark visual-spark-one">+</span>
+              <span class="visual-spark visual-spark-two">+</span>
+            </div>
+          </section>
+
+          <section class="class-view" id="classView" hidden>
+            <div class="class-toolbar">
+              <p class="breadcrumb">
+                <span>全部班级</span>
+                <span aria-hidden="true">/</span>
+                <strong id="breadcrumbClassName">当前班级</strong>
+              </p>
+              <div class="class-toolbar-actions">
+                <button class="button button-quiet button-compact" id="renameClass" type="button">
+                  重命名
+                </button>
+                <button class="button button-danger-quiet button-compact" id="deleteClass" type="button">
+                  删除班级
+                </button>
+              </div>
+            </div>
+
+            <div class="class-heading">
+              <div>
+                <p class="eyebrow">CURRENT CLASS</p>
+                <h2 id="className">班级名称</h2>
+                <p class="class-meta" id="classMeta">0 名同学</p>
+              </div>
+              <button class="button button-secondary" id="manageRoster" type="button">
+                录入 / 编辑名单
+              </button>
+            </div>
+
+            <div class="workspace-grid">
+              <section class="draw-panel" aria-labelledby="drawPanelTitle">
+                <div class="panel-heading">
+                  <div>
+                    <p class="eyebrow">NO REPEAT</p>
+                    <h3 id="drawPanelTitle">本轮点名台</h3>
+                  </div>
+                  <div class="progress-copy">
+                    <span>本轮进度</span>
+                    <strong id="progressText">0 / 0</strong>
+                  </div>
+                </div>
+
+                <div
+                  class="progress-track"
+                  role="progressbar"
+                  aria-label="本轮点名进度"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                  id="progressTrack"
+                >
+                  <span id="progressBar"></span>
+                </div>
+
+                <div class="draw-stage" id="drawStage">
+                  <div class="stage-pattern" aria-hidden="true"></div>
+                  <p class="stage-kicker" id="stageKicker">READY</p>
+                  <div class="result-wrap">
+                    <div class="result-name" id="resultName">等待点名</div>
+                    <p class="result-caption" id="resultCaption">点击下方按钮开始</p>
+                  </div>
+                  <div class="confetti" id="confetti" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                  </div>
+                </div>
+
+                <div class="draw-actions">
+                  <button class="button button-primary button-large" id="drawButton" type="button">
+                    开始点名
+                  </button>
+                  <button class="button button-quiet" id="resetRound" type="button" disabled>
+                    重新抽一轮
+                  </button>
+                </div>
+                <p class="draw-hint" id="drawHint">
+                  每次都会从未抽名单中随机选择，本轮不会重复。
+                </p>
+              </section>
+
+              <aside class="history-panel" aria-labelledby="historyTitle">
+                <div class="history-heading">
+                  <div>
+                    <p class="eyebrow">THIS ROUND</p>
+                    <h3 id="historyTitle">本轮已抽</h3>
+                  </div>
+                  <span class="history-count" id="historyCount">0 人</span>
+                </div>
+                <div class="history-empty" id="historyEmpty">
+                  <span class="history-empty-mark" aria-hidden="true"></span>
+                  <p>还没有抽过名字</p>
+                </div>
+                <ol class="history-list" id="historyList"></ol>
+              </aside>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <dialog class="modal" id="classDialog" aria-labelledby="classDialogTitle">
+      <form class="modal-card" id="classForm">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow" id="classDialogEyebrow">NEW FOLDER</p>
+            <h2 id="classDialogTitle">新建班级</h2>
+          </div>
+          <button
+            class="modal-close"
+            type="button"
+            data-close-dialog="classDialog"
+            aria-label="关闭"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <label class="field-label" for="classInput">班级名称</label>
+        <input
+          class="text-input"
+          id="classInput"
+          name="className"
+          type="text"
+          maxlength="40"
+          autocomplete="off"
+          placeholder="例如：高二（3）班"
+          required
+        />
+        <p class="field-error" id="classInputError" role="alert"></p>
+        <div class="modal-actions">
+          <button class="button button-quiet" type="button" data-close-dialog="classDialog">
+            取消
+          </button>
+          <button class="button button-primary" id="classSubmitButton" type="submit">
+            创建班级
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal modal-wide" id="rosterDialog" aria-labelledby="rosterDialogTitle">
+      <form class="modal-card" id="rosterForm">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">STUDENT ROSTER</p>
+            <h2 id="rosterDialogTitle">录入班级名单</h2>
+          </div>
+          <button
+            class="modal-close"
+            type="button"
+            data-close-dialog="rosterDialog"
+            aria-label="关闭"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <label class="field-label" for="rosterInput">同学姓名</label>
+        <textarea
+          class="text-area"
+          id="rosterInput"
+          name="roster"
+          rows="11"
+          placeholder="每行一个姓名，也可用逗号、顿号或制表符分隔&#10;张小明&#10;李小红&#10;王小雨"
+        ></textarea>
+        <div class="roster-tools">
+          <p>保存后会自动生成不放回式点名名单。</p>
+          <span id="rosterPreviewCount">0 名同学</span>
+        </div>
+        <div class="modal-actions">
+          <button class="button button-quiet" type="button" data-close-dialog="rosterDialog">
+            取消
+          </button>
+          <button class="button button-primary" type="submit">保存名单</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <p class="sr-only" id="liveStatus" aria-live="polite"></p>
+    <noscript>此工具需要启用 JavaScript 才能使用。</noscript>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

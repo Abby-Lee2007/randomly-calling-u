@@ -1,0 +1,14 @@
+{
+  "name": "random-class-caller",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "按班级名单进行不放回式随机点名的本地网页工具。",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/core.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
